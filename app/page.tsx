@@ -1,13 +1,10 @@
 import Link from "next/link";
-import { getAllWikiPages } from "@/lib/mdx";
+import { categoriesOf, formatDate, getAllWikiPages } from "@/lib/mdx";
+import { excerpt } from "@/lib/markdown";
 
-function excerpt(content: string) {
-  const line = content.split("\n").find((item) => item.trim() && !item.trim().startsWith("#"));
-  return line?.replace(/[*_]/g, "").slice(0, 150) || "A page in the local knowledge archive.";
-}
 export default async function Home() {
   const pages = await getAllWikiPages();
-  const categories = [...new Set(pages.map((page) => page.category))];
+  const categories = categoriesOf(pages);
 
   return (
     <main className="wiki-shell">
@@ -41,8 +38,8 @@ export default async function Home() {
           {pages.map((page, index) => (
             <Link href={"/wiki/" + page.slug} className="page-row" key={page.slug}>
               <span className="page-number">{String(index + 1).padStart(2, "0")}</span>
-              <div className="page-copy"><span>{page.category}</span><h3>{page.title}</h3><p>{excerpt(page.content)}</p></div>
-              <div className="page-meta"><time>{new Date(page.last_updated).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</time><b>OPEN ↗</b></div>
+              <div className="page-copy"><span>{page.category}</span><h3>{page.title}</h3><p>{excerpt(page.content, 150)}</p></div>
+              <div className="page-meta"><time>{formatDate(page.last_updated, "short")}</time><b>OPEN ↗</b></div>
             </Link>
           ))}
         </div>

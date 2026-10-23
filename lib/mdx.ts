@@ -1,6 +1,6 @@
-import fs from 'fs/promises';
-import path from 'path';
-import matter from 'gray-matter';
+import fs from "fs/promises";
+import path from "path";
+import matter from "gray-matter";
 
 export interface WikiPage {
   title: string;
@@ -12,85 +12,70 @@ export interface WikiPage {
   slug: string;
 }
 
-export async function getAllWikiPages() {
-  const contentDir = path.join(process.cwd(), 'content', 'wiki');
-  const files = await fs.readdir(contentDir);
-  const mdxFiles = files.filter(file => file.endsWith('.mdx'));
+const CONTENT_DIR = path.join(process.cwd(), "content", "wiki");
+const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-  const pages = await Promise.all(
-    mdxFiles.map(async (file) => {
-      const filePath = path.join(contentDir, file);
-      const fileContent = await fs.readFile(filePath, 'utf8');
-      const { data, content } = matter(fileContent);
-
-      return {
-        ...data,
-        slug: file.replace('.mdx', ''),
-        last_updated: data.last_updated || new Date().toISOString(),
-        content
-      } as WikiPage;
-    })
-  );
-
-  return pages.sort((a, b) => {
-    const dateA = new Date(a.last_updated);
-    const dateB = new Date(b.last_updated);
-    return dateB.getTime() - dateA.getTime();
-  });
+export function isValidSlug(slug: unknown): slug is string {
+  return typeof slug === "string" && SLUG.test(slug);
 }
 
-export async function getWikiPageBySlug(slug: string) {
-  try {
-    const contentDir = path.join(process.cwd(), 'content', 'wiki');
-    const filePath = path.join(contentDir, `${slug}.mdx`);
-    const fileContent = await fs.readFile(filePath, 'utf8');
-    const { data, content } = matter(fileContent);
+function toPage(slug: string, raw: string): WikiPage {
+  const { data, content } = matter(raw);
+  const list = (value: unknown) => (Array.isArray(value) ? value.map(String) : []);
+  return {
+    slug,
+    title: typeof data.title === "string" ? data.title : slug,
+    category: typeof data.category === "string" ? data.category : "uncategorised",
+    tags: list(data.tags),
+    related_pages: list(data.related_pages),
+    // gray-matter may parse an unquoted date into a Date; keep a stable YYYY-MM-DD string.
+    last_updated: data.last_updated instanceof Date ? data.last_updated.toISOString().slice(0, 10) : String(data.last_updated ?? ""),
+    content,
+  };
+}
 
-    return {
-      ...data,
-      slug,
-      last_updated: data.last_updated || new Date().toISOString(),
-      content
-    } as WikiPage;
-  } catch (error) {
+/** Newest first; pages without a date sort last. */
+export function sortByUpdated(pages: WikiPage[]): WikiPage[] {
+  return [...pages].sort((a, b) => (b.last_updated || "").localeCompare(a.last_updated || "") || a.slug.localeCompare(b.slug));
+}
+
+export async function getAllWikiPages(): Promise<WikiPage[]> {
+  const files = (await fs.readdir(CONTENT_DIR)).filter((file) => file.endsWith(".mdx"));
+  const pages = await Promise.all(files.map(async (file) => toPage(file.slice(0, -4), await fs.readFile(path.join(CONTENT_DIR, file), "utf8"))));
+  return sortByUpdated(pages);
+}
+
+/** Null for an unknown slug, and for anything that is not a plain slug (no path traversal). */
+export async function getWikiPageBySlug(slug: unknown): Promise<WikiPage | null> {
+  if (!isValidSlug(slug)) return null;
+  try {
+    return toPage(slug, await fs.readFile(path.join(CONTENT_DIR, `${slug}.mdx`), "utf8"));
+  } catch {
     return null;
   }
 }
 
-export async function searchWikiPages(query: string) {
-  const pages = await getAllWikiPages();
-  const lowercaseQuery = query.toLowerCase();
-
-  return pages.filter(page =>
-    page.title.toLowerCase().includes(lowercaseQuery) ||
-    page.category.toLowerCase().includes(lowercaseQuery) ||
-    page.tags.some(tag => tag.toLowerCase().includes(lowercaseQuery)) ||
-    page.content.toLowerCase().includes(lowercaseQuery)
+export function filterPages(pages: WikiPage[], filter: { category?: string; tag?: string; query?: string }): WikiPage[] {
+  const tag = filter.tag?.toLowerCase();
+  const query = filter.query?.trim().toLowerCase();
+  return pages.filter(
+    (page) =>
+      (!filter.category || page.category === filter.category) &&
+      (!tag || page.tags.some((item) => item.toLowerCase() === tag)) &&
+      (!query || [page.title, page.category, page.content, ...page.tags].some((field) => field.toLowerCase().includes(query))),
   );
 }
 
-export async function getPagesByCategory(category: string) {
-  const pages = await getAllWikiPages();
-  return pages.filter(page => page.category === category);
+export function categoriesOf(pages: WikiPage[]): string[] {
+  return [...new Set(pages.map((page) => page.category))];
 }
 
-export async function getPagesByTag(tag: string) {
-  const pages = await getAllWikiPages();
-  const lowercaseTag = tag.toLowerCase();
-  return pages.filter(page =>
-    page.tags.some(pageTag => pageTag.toLowerCase() === lowercaseTag)
-  );
+export function tagsOf(pages: WikiPage[]): string[] {
+  return [...new Set(pages.flatMap((page) => page.tags))];
 }
 
-export async function getCategories() {
-  const pages = await getAllWikiPages();
-  const categories = [...new Set(pages.map(page => page.category))];
-  return categories;
-}
-
-export async function getAllTags() {
-  const pages = await getAllWikiPages();
-  const allTags = pages.flatMap(page => page.tags);
-  const uniqueTags = [...new Set(allTags)];
-  return uniqueTags;
+export function formatDate(value: string, month: "short" | "long"): string {
+  const date = new Date(`${value}T12:00:00Z`);
+  if (!value || Number.isNaN(date.getTime())) return "Undated";
+  return date.toLocaleDateString("en-GB", { day: "2-digit", month, year: "numeric", timeZone: "UTC" });
 }

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getWikiPageBySlug, getAllWikiPages } from "@/lib/mdx";
+import { formatDate, getWikiPageBySlug, getAllWikiPages } from "@/lib/mdx";
+import { Markdown } from "@/lib/markdown";
 
 interface PageProps { params: Promise<{ slug: string }> }
 
@@ -24,12 +25,12 @@ export default async function WikiPageDetail({ params }: PageProps) {
       </header>
       <article className="wiki-article">
         <header className="article-header">
-          <div><p className="wiki-kicker">{page.category} / FIELD NOTE</p><h1>{page.title}</h1><p className="article-date">Updated {new Date(page.last_updated).toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })}</p></div>
+          <div><p className="wiki-kicker">{page.category} / FIELD NOTE</p><h1>{page.title}</h1><p className="article-date">Updated {formatDate(page.last_updated, "long")}</p></div>
           <div className="article-tags">{page.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
         </header>
         <div className="article-grid">
           <aside className="article-rail"><span>READING ORDER</span><strong>01</strong><Link href="/wiki">← All pages</Link>{page.related_pages.length > 0 && <><span className="related-label">RELATED</span>{page.related_pages.map((related) => availableSlugs.has(related) ? <Link href={"/wiki/" + related} key={related}>{related} ↗</Link> : <span className="unavailable-related" key={related}>{related} · not on file</span>)}</>}</aside>
-          <div className="wiki-body"><div dangerouslySetInnerHTML={{ __html: page.content }} /></div>
+          <div className="wiki-body"><Markdown source={page.content} title={page.title} availableSlugs={availableSlugs} /></div>
         </div>
       </article>
       <footer className="wiki-footer"><span>BOOKCHAOWALIT / WIKI LEAF</span><span>STATIC MDX · READ ONLY</span></footer>
