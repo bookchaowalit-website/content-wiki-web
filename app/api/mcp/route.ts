@@ -1,5 +1,4 @@
 import { NextRequest } from 'next/server';
-import { RuntimeException } from '@anthropic-ai/sdk/core';
 
 export const runtime = 'edge';
 
