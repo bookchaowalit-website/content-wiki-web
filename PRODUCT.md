@@ -1,60 +1,43 @@
-# bookchaowalit-wiki-frontend — Product brief
+# Field Manual wiki — Product truth
 
-**Slug:** `bookchaowalit-website/bookchaowalit-wiki-frontend`  
-**Generated:** 2026-08-11 (bulk Book Dev closeout)  
-**Status:** starter / portfolio boundary
+> Inferred from the code and copy (no user interview). Checked against the portfolio card claims review
+> (`portfolio-site-web/docs/audits/CARD-CLAIMS-REVIEW-2026-10.md`, row `wiki`) on 2026-10-23.
 
-## Purpose
+## What it is
 
-Portfolio repository under Book Dev. This brief records ownership and the
-current honest status so the nested tree is not an empty shell in the task
-system.
+A read-only personal knowledge shelf: three authored markdown pages in `content/wiki/`, rendered by Next.js.
 
-## Runnable path
+## Who it is for
 
-See `README.md` for install and run instructions when present.
+A portfolio visitor who wants to read short reference notes and see a calm editorial layout.
 
-## Limits
+## What works today
 
-- Not claimed as production-ready unless README and tests prove it.
-- Mobile smoke / emulator acceptance is separate and toolchain-dependent.
+1. Home and `/wiki` list the pages (newest first) with excerpts; `/wiki?category=` and `/wiki?tag=` filter the index.
+2. `/wiki/<slug>` renders the page as real headings, lists and code blocks. Content HTML is escaped, unsafe links
+   are dropped and links to missing wiki pages are marked "not on file". Unknown slugs return 404.
+3. `/api/mcp` answers JSON-RPC with `get_entries`, `get_entry_by_slug`, `search_entries` and `get_categories`
+   over the same files, echoing the request id.
+4. Front-end and server errors go to Sentry (errors only, personal data stripped) when `NEXT_PUBLIC_SENTRY_DSN` is set.
 
-<!-- impeccable:product-schema 1 -->
+## What does not work (and must not be claimed)
 
-## Platform
+- No community editing, GitHub-backed editing, PR review, automatic backlinks or "45+ domains" (portfolio card
+  claims flagged in the 2026-10 review). There are three pages; several pages they link to do not exist.
+- No search box on the site (search exists only as the MCP `search_entries` tool). No accounts or storage.
 
-web
+## Live URL and deploy state
 
-## Current product truth
+- Live: https://wiki.bookchaowalit.com (HTTP 200 on 2026-10-23). The live detail pages
+  (e.g. `/wiki/react-hooks`) still show the raw markdown text and inject the HTML from code samples (4 live
+  `<button>` elements on that page), the bug fixed on `main`.
+- Last production deploy: 2026-10-23 12:27 (+07), Vercel CLI, commit ddc98a5 (the CVE patch). The Vercel project
+  `bookchaowalit-wiki-frontend` has a Git link naming the old repository (`bookchaowalit/bookchaowalit-wiki-frontend`),
+  so a push to `main` does not deploy. The L2 commits stay undeployed until the owner reconnects Vercel Git to
+  `bookchaowalit-website/content-wiki-web` (owner action D9).
+- `NEXT_PUBLIC_SENTRY_DSN` is set on the Vercel project (Sentry project `content-wiki-web`, org `personal-yu0`).
 
-Inferred from the existing code and README; user confirmation pending. This is
-a read-only personal knowledge base backed by local MDX files. The current
-content includes JavaScript Basics, React Hooks, and Design Patterns, with
-categories, tags, related-page links, and detail routes. There is no CMS,
-editing workflow, authentication, or remote search index.
+## Boundaries
 
-## Source README excerpt
-
-```
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize an
-```
+- Reads only its own `content/` directory; slugs are validated (lowercase kebab-case) before any file read.
+- No personal data is collected.
