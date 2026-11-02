@@ -16,7 +16,7 @@ describe("MCP route", () => {
 
   it("get_entries lists the real wiki pages, optionally by category", async () => {
     const all = await call("get_entries");
-    expect(all.result.entries.map((e: { slug: string }) => e.slug).sort()).toEqual(["design-patterns", "javascript-basics", "react-hooks"]);
+    expect(all.result.entries.map((e: { slug: string }) => e.slug).sort()).toEqual(["design-patterns", "javascript-basics", "low-seniority-careers", "react-hooks"]);
     const react = await call("get_entries", { category: "react" });
     expect(react.result.entries.map((e: { slug: string }) => e.slug)).toEqual(["react-hooks"]);
   });
@@ -34,7 +34,7 @@ describe("MCP route", () => {
     const found = await call("search_entries", { query: "useReducer" });
     expect(found.result.entries.map((e: { slug: string }) => e.slug)).toEqual(["react-hooks"]);
     const cats = await call("get_categories");
-    expect([...cats.result.categories].sort()).toEqual(["architecture", "programming", "react"]);
+    expect([...cats.result.categories].sort()).toEqual(["architecture", "career", "programming", "react"]);
   });
 
   it("rejects unknown tools, unknown methods and bad JSON with JSON-RPC errors", async () => {

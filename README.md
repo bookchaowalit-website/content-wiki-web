@@ -1,7 +1,7 @@
 # Field Manual wiki
 
-A read-only Next.js wiki over **three local markdown pages** in `content/wiki/*.mdx` (JavaScript basics, React
-hooks, design patterns). There is no editor, no CMS and no GitHub-backed editing.
+A read-only Next.js wiki over **four local markdown pages** in `content/wiki/*.mdx` (JavaScript basics, React
+hooks, design patterns, and a Thai career note on low-seniority work). There is no editor, no CMS and no GitHub-backed editing.
 
 ## What it does
 

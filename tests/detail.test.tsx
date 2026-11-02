@@ -8,7 +8,7 @@ async function render(slug: string) {
 
 describe("wiki detail page", () => {
   it("prerenders every page on file", async () => {
-    expect((await generateStaticParams()).map((p) => p.slug).sort()).toEqual(["design-patterns", "javascript-basics", "react-hooks"]);
+    expect((await generateStaticParams()).map((p) => p.slug).sort()).toEqual(["design-patterns", "javascript-basics", "low-seniority-careers", "react-hooks"]);
   });
 
   it("renders the markdown as headings, lists and code blocks, not raw markdown text", async () => {

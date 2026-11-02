@@ -13,7 +13,7 @@ describe("home page", () => {
     expect(html).toContain("React Hooks");
     expect(html).toContain("JavaScript Basics");
     expect(html).toContain("Design Patterns");
-    expect(html).toMatch(/3(<!-- -->)? PAGES · READ ONLY/);
+    expect(html).toMatch(/4(<!-- -->)? PAGES · READ ONLY/);
     expect(html).not.toContain("**");
   });
 });

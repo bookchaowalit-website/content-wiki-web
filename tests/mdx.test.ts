@@ -4,11 +4,11 @@ import { filterPages, formatDate, getAllWikiPages, getWikiPageBySlug, isValidSlu
 const page = (slug: string, last_updated: string, extra: Partial<WikiPage> = {}): WikiPage => ({ slug, title: slug, category: "c", tags: [], related_pages: [], content: "", last_updated, ...extra });
 
 describe("content loading", () => {
-  it("reads the three local pages, newest first, with typed front matter", async () => {
+  it("reads the local pages, newest first, with typed front matter", async () => {
     const pages = await getAllWikiPages();
-    expect(pages.map((p) => p.slug)).toEqual(["design-patterns", "react-hooks", "javascript-basics"]);
-    expect(pages[0]).toMatchObject({ title: "Design Patterns", category: "architecture", last_updated: "2024-03-20" });
-    expect(pages[0].tags).toContain("architecture");
+    expect(pages.map((p) => p.slug)).toEqual(["low-seniority-careers", "design-patterns", "react-hooks", "javascript-basics"]);
+    expect(pages[1]).toMatchObject({ title: "Design Patterns", category: "architecture", last_updated: "2024-03-20" });
+    expect(pages[1].tags).toContain("architecture");
   });
 
   it("returns null for unknown slugs and for anything that is not a plain slug", async () => {

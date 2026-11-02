@@ -5,7 +5,7 @@
 
 ## What it is
 
-A read-only personal knowledge shelf: three authored markdown pages in `content/wiki/`, rendered by Next.js.
+A read-only personal knowledge shelf: four authored markdown pages in `content/wiki/`, rendered by Next.js.
 
 ## Who it is for
 
@@ -23,7 +23,7 @@ A portfolio visitor who wants to read short reference notes and see a calm edito
 ## What does not work (and must not be claimed)
 
 - No community editing, GitHub-backed editing, PR review, automatic backlinks or "45+ domains" (portfolio card
-  claims flagged in the 2026-10 review). There are three pages; several pages they link to do not exist.
+  claims flagged in the 2026-10 review). There are four pages; several pages they link to do not exist.
 - No search box on the site (search exists only as the MCP `search_entries` tool). No accounts or storage.
 
 ## Live URL and deploy state
