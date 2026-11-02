@@ -1,4 +1,8 @@
-# Field Manual wiki
+# Field Manual wiki (retired)
+
+> **Merged into Knowledge Hub on 2026-11-03.** All four pages now live on the knowledge shelf of
+> [knowledgehub.bookchaowalit.com](https://knowledgehub.bookchaowalit.com) (repo `bookchaowalit-website/content-knowledgehub-web`).
+> wiki.bookchaowalit.com redirects there. This repository is archived and kept for history only.
 
 A read-only Next.js wiki over **four local markdown pages** in `content/wiki/*.mdx` (JavaScript basics, React
 hooks, design patterns, and a Thai career note on low-seniority work). There is no editor, no CMS and no GitHub-backed editing.
